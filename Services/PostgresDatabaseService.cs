@@ -1428,7 +1428,7 @@ namespace PaymentAPI.Services
                 await conn.OpenAsync(cancellationToken);
 
                 using var cmd = new NpgsqlCommand(
-                    "SELECT * FROM fn_get_active_pos_edc_machine_details_test(@p_pos_edc_sno, @p_provider_name);",
+                    "SELECT * FROM fn_get_active_pos_edc_machine_details(@p_pos_edc_sno, @p_provider_name);",
                     conn);
 
                 cmd.Parameters.AddWithValue("p_pos_edc_sno", posEdcMachine);

@@ -3146,6 +3146,10 @@ namespace PaymentAPI.Controllers
                         ? rrn.GetString()
                         : "";
 
+                    posRequest.refernceId = 
+                        data.TryGetProperty("referenceNumber", out var rrn)
+                        ? rrn.GetString()
+                        : "";
                     // ================= FINAL STATUS =================
 
                     if (txnStatus.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))
@@ -3207,8 +3211,18 @@ namespace PaymentAPI.Controllers
                         paymentResponse.message = $"Unknown status: {txnStatus}";
                     }
 
-                    await _pgdb.InsertPaylinkPosEdcMachineTransactionLogAsync(
-                        posRequest, action, "{}", responseText, paymentResponse.status);
+                    string jsonPayload = $@"
+                                            Method        : GET
+                                            URL           : {url}
+                                            MerchantId    : {merchantId}
+                                            TransactionId : {txnId}
+                                            X-VERIFY(Header)      : {xVerify}";
+
+
+                    //await _pgdb.InsertPaylinkPosEdcMachineTransactionLogAsync(
+                    //    posRequest, action, "{}", responseText, paymentResponse.status);
+                    OperationResult result;
+                    result= await _pgdb.UpdateStatusPaylinkPosEdcMachineTransactionLogAsync(posRequest, jsonPayload, responseText);
 
                     return StatusCode(200, paymentResponse);
                 }
